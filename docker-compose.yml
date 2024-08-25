@@ -1,0 +1,24 @@
+services:
+  python-brc:
+    image: python-brc
+    environment:
+      ENV: prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/tmp
+#    networks:
+#      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 6000M
+        reservations:
+          cpus: '0.50'
+          memory: 200M
+#networks:
+#  backend:
+#    name: 1brc
+#    external: true
