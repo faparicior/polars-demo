@@ -1,0 +1,6 @@
+polars==1.2.1
+pandas
+dask
+dask[dataframe]
+dask-expr
+vaex
