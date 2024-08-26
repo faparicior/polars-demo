@@ -4,3 +4,5 @@ dask
 dask[dataframe]
 dask-expr
 vaex
+
+psutil~=6.0.0

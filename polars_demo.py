@@ -1,5 +1,6 @@
 import time
 import polars as pl
+import psutil
 
 start_time1 = time.time()
 
@@ -16,3 +17,8 @@ print(result.collect(streaming=True))
 
 end_time1 = time.time()
 print(f"Time taken: {end_time1 - start_time1:.2f} seconds")
+
+# Getting % usage of virtual_memory ( 3rd field)
+print('RAM memory % used:', psutil.virtual_memory()[2])
+# Getting usage of virtual_memory in GB ( 4th field)
+print('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
