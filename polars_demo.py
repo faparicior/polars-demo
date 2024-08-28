@@ -4,7 +4,11 @@ import psutil
 
 start_time1 = time.time()
 
-data = pl.scan_csv('/tmp/data/discogs.csv', low_memory=True, rechunk=False)
+data = pl.scan_parquet('/tmp/data/discogs.parquet')
+# data = pl.scan_csv('/tmp/data/discogs.csv', low_memory=True, rechunk=False)
+# data.collect().write_parquet('/tmp/data/discogs.parquet')
+# print("ok")
+# exit(0)
 # data = pl.scan_csv('./data/discogs.csv')
 result = data.group_by('artist_name').len().select('artist_name')
 

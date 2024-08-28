@@ -4,9 +4,10 @@ import psutil
 
 start_time1 = time.time()
 
-data = pd.read_csv('/tmp/data/discogs.csv', low_memory=True, chunksize=10000)
-result = pd.concat([df.groupby('artist_name').size() for df in data])
-
+# data = pd.read_csv('/tmp/data/discogs.csv', low_memory=True, chunksize=10000)
+data = pd.read_parquet('/tmp/data/discogs.parquet',)
+# result = pd.concat([df.groupby('artist_name').size() for df in data])
+result = data.groupby('artist_name')
 print(result)
 
 end_time1 = time.time()
