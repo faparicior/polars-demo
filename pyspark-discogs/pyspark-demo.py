@@ -22,7 +22,7 @@ else:
         data = spark.read.csv(file_path, header=True, inferSchema=True)
 
         # Perform the groupby operation
-        result = data.groupBy('artist_name').count()
+        result = data.select('artist_name').distinct()
 
         # Show the result
         result.show()
