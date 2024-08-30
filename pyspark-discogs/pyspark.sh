@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-docker cp -L pyspark_challenge.py 1brc-spark-master-1:/opt/bitnami/spark/pyspark_challenge.py
+docker cp -L pyspark-demo.py pandas-polars-test-spark-master-1:/opt/bitnami/spark/pyspark-demo.py
 
-docker logs 1brc-spark-master-1
+docker logs pandas-polars-test-spark-master-1

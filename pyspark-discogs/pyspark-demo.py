@@ -1,24 +1,37 @@
 import time
 from pyspark.sql import SparkSession
+import os
 
 # Initialize Spark session
 spark = SparkSession.builder \
     .appName("Discogs Processing") \
+    .master("spark://spark-master:7077") \
     .getOrCreate()
 
 start_time1 = time.time()
 
-# Read the CSV file
-data = spark.read.csv('/tmp/data/discogs/discogs.csv', header=True, inferSchema=True)
+# File path
+file_path = '/opt/bitnami/spark/data/discogs/discogs.csv'
 
-# Perform the groupby operation
-result = data.groupBy('artist_name').count()
+# Check if file exists
+if not os.path.exists(file_path):
+    print(f"Error: File does not exist at {file_path}")
+else:
+    try:
+        # Read the CSV file
+        data = spark.read.csv(file_path, header=True, inferSchema=True)
 
-# Show the result
-result.show()
+        # Perform the groupby operation
+        result = data.groupBy('artist_name').count()
 
-end_time1 = time.time()
-print(f"Time taken: {end_time1 - start_time1:.2f} seconds")
+        # Show the result
+        result.show()
+
+        end_time1 = time.time()
+        print(f"Time taken: {end_time1 - start_time1:.2f} seconds")
+
+    except Exception as e:
+        print(f"Error processing data: {str(e)}")
 
 # Stop the Spark session
 spark.stop()
