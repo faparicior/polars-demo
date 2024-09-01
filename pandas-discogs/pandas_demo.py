@@ -1,23 +1,26 @@
 import time
 import pandas as pd
 import psutil
+from collections import Counter
 
-def process_data(file_path, data_format):
-    print(f"Process {data_format}...")
-    start_time = time.time()
-    if data_format == "CSV":
-        data = pd.read_csv('/tmp/data/discogs/discogs.csv', low_memory=True, chunksize=10000)
-    else:
-        data = pd.read_parquet('/tmp/data/discogs/discogs.parquet',)
 
-    result = pd.concat([df.groupby('artist_name').size() for df in data])
-    print(result)
+def process_csv_in_chunks(file_path, chunk_size=10000):
+    artist_counter = Counter()
 
-    end_time = time.time()
-    print(f"Time taken: {end_time - start_time:.2f} seconds")
+    for chunk in pd.read_csv(file_path, chunksize=chunk_size):
+        artist_counts = chunk['artist_name'].value_counts()
+        artist_counter.update(artist_counts.to_dict())
 
-# Process CSV
-process_data("/tmp/data/discogs/discogs.csv", "CSV")
+    return pd.DataFrame.from_dict(artist_counter, orient='index', columns=['count']).reset_index().rename(
+        columns={'index': 'artist_name'}).sort_values('count', ascending=False)
 
-# Process Parquet
-process_data("/tmp/data/discogs/discogs.parquet", "Parquet")
+
+start_time = time.time()
+
+# Process the CSV file
+result = process_csv_in_chunks('/tmp/data/discogs/discogs.csv')
+
+print(result)
+
+end_time = time.time()
+print(f"Time taken: {end_time - start_time:.2f} seconds")
