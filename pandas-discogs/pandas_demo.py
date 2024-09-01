@@ -2,19 +2,22 @@ import time
 import pandas as pd
 import psutil
 
-start_time1 = time.time()
+def process_data(file_path, data_format):
+    print(f"Process {data_format}...")
+    start_time = time.time()
+    if data_format == "CSV":
+        data = pd.read_csv('/tmp/data/discogs/discogs.csv', low_memory=True, chunksize=10000)
+    else:
+        data = pd.read_parquet('/tmp/data/discogs/discogs.parquet',)
 
-data = pd.read_csv('/tmp/data/discogs/discogs.csv', low_memory=True, chunksize=10000)
-# data = pd.read_parquet('/tmp/data/discogs/discogs.parquet',)
-result = pd.concat([df.groupby('artist_name').size() for df in data])
+    result = pd.concat([df.groupby('artist_name').size() for df in data])
+    print(result)
 
-# result = data.groupby('artist_name')
-print(result)
+    end_time = time.time()
+    print(f"Time taken: {end_time - start_time:.2f} seconds")
 
-end_time1 = time.time()
-print(f"Time taken: {end_time1 - start_time1:.2f} seconds")
+# Process CSV
+process_data("/tmp/data/discogs/discogs.csv", "CSV")
 
-# Getting % usage of virtual_memory ( 3rd field)
-print('RAM memory % used:', psutil.virtual_memory()[2])
-# Getting usage of virtual_memory in GB ( 4th field)
-print('RAM Used (GB):', psutil.virtual_memory()[3]/1000000000)
+# Process Parquet
+process_data("/tmp/data/discogs/discogs.parquet", "Parquet")
