@@ -3,36 +3,27 @@ import time
 
 import polars as pl
 
-print("Process CSV...")
-start_time1 = time.time()
-df = (
-    pl.scan_parquet("/tmp/data/1brc/measurements.parquet", low_memory=True, parallel='row_groups')
-        .group_by("station_name")
-        .agg(
-            pl.min("measurement").alias("min_measurement"),
-            pl.mean("measurement").alias("mean_measurement"),
-            pl.max("measurement").alias("max_measurement")
-        )
-        .collect(streaming=True)
-)
-print(df)
+def process_data(file_path, data_format):
+    print(f"Process {data_format}...")
+    start_time = time.time()
+    if data_format == "CSV":
+        df = pl.scan_csv(file_path, low_memory=True, separator=";", has_header=False, with_column_names=lambda cols: ["station_name", "measurement"])
+    else:
+        df = pl.scan_parquet(file_path, low_memory=True, parallel='row_groups')
 
-end_time1 = time.time()
-print(f"Time taken: {end_time1 - start_time1:.2f} seconds")
+    df = df.group_by("station_name").agg(
+        pl.min("measurement").alias("min_measurement"),
+        pl.mean("measurement").alias("mean_measurement"),
+        pl.max("measurement").alias("max_measurement")
+    ).collect(streaming=True)
 
-print("Process Parquet...")
-start_time1 = time.time()
-df = (
-    pl.scan_csv("/tmp/data/1brc/measurements.csv", separator=";", has_header=False, with_column_names=lambda cols: ["station_name", "measurement"])
-        .group_by("station_name")
-        .agg(
-            pl.min("measurement").alias("min_measurement"),
-            pl.mean("measurement").alias("mean_measurement"),
-            pl.max("measurement").alias("max_measurement")
-        )
-        .collect(streaming=True)
-)
-print(df)
+    print(df)
+    end_time = time.time()
+    print(f"Time taken: {end_time - start_time:.2f} seconds")
 
-end_time1 = time.time()
-print(f"Time taken: {end_time1 - start_time1:.2f} seconds")
+
+# Process CSV
+process_data("/tmp/data/1brc/measurements.csv", "CSV")
+
+# Process Parquet
+process_data("/tmp/data/1brc/measurements.parquet", "Parquet")
