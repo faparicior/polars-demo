@@ -1,22 +1,22 @@
 import time
 import polars as pl
 
-print("Process CSV...")
+def process_data(file_path, data_format):
+    print(f"Process {data_format}...")
+    start_time = time.time()
+    if data_format == "CSV":
+        data = pl.scan_csv(file_path, low_memory=True, rechunk=False)
+    else:
+        data = pl.scan_parquet(file_path, low_memory=True, parallel='row_groups')
 
-start_time1 = time.time()
-data = pl.scan_csv('/tmp/data/discogs.csv', low_memory=True, rechunk=False)
-result = data.group_by('artist_name').len().select('artist_name')
-print(result.collect(streaming=True))
+    result = data.group_by('artist_name').len().select('artist_name')
+    print(result.collect(streaming=True))
 
-end_time1 = time.time()
-print(f"Time taken: {end_time1 - start_time1:.2f} seconds")
+    end_time = time.time()
+    print(f"Time taken: {end_time - start_time:.2f} seconds")
 
-print("Process Parquet...")
+# Process CSV
+process_data("/tmp/data/discogs/discogs.csv", "CSV")
 
-start_time1 = time.time()
-data = pl.scan_parquet('/tmp/data/discogs.parquet')
-result = data.group_by('artist_name').len().select('artist_name')
-print(result.collect(streaming=True))
-
-end_time1 = time.time()
-print(f"Time taken: {end_time1 - start_time1:.2f} seconds")
+# Process Parquet
+process_data("/tmp/data/discogs/discogs.parquet", "Parquet")
