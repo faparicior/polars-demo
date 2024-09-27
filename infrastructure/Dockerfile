@@ -1,6 +1,7 @@
 #FROM python:3.11-slim-bookworm
 FROM python:3.9-slim-bookworm
 RUN apt-get update
+RUN apt-get install -y graphviz
 #RUN apt-get install -y postgresql-client librdkafka-dev gcc make
 RUN python3 -m venv /opt/venv
 #RUN rm /usr/lib/python3.11/EXTERNALLY-MANAGED

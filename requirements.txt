@@ -1,8 +1,11 @@
 polars==1.2.1
 pandas
 dask
-dask[dataframe]
+dask[distributed]
+dask[lz4]
 dask-expr
 vaex
 
 psutil~=6.0.0
+
+graphviz

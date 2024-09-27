@@ -15,7 +15,16 @@ def process_data(file_path, data_format):
         pl.min("measurement").alias("min_measurement"),
         pl.mean("measurement").alias("mean_measurement"),
         pl.max("measurement").alias("max_measurement")
-    ).collect(streaming=True)
+    )
+
+    df.show_graph(optimized=True, output_path="/tmp/data/1brc/graph.png")
+
+    df.collect(streaming=True)
+    df = (df.group_by("station_name").agg(
+        pl.min("measurement").alias("min_measurement"),
+        pl.mean("measurement").alias("mean_measurement"),
+        pl.max("measurement").alias("max_measurement")
+    ).collect(streaming=True))
 
     print(df)
     end_time = time.time()

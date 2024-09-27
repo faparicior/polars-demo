@@ -12,6 +12,7 @@ start_time1 = time.time()
 
 # File path
 file_path = '/opt/bitnami/spark/data/discogs/discogs.csv'
+file_path = '/opt/bitnami/spark/data/discogs/discogs.parquet'
 
 # Check if file exists
 if not os.path.exists(file_path):
@@ -19,7 +20,8 @@ if not os.path.exists(file_path):
 else:
     try:
         # Read the CSV file
-        data = spark.read.csv(file_path, header=True, inferSchema=True)
+        # data = spark.read.csv(file_path, header=True, inferSchema=True)
+        data = spark.read.parquet(file_path)
 
         # Perform the groupby operation
         result = data.select('artist_name').distinct()
