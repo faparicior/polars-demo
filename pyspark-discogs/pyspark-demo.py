@@ -10,7 +10,7 @@ def process_data(file_path, data_format):
     else:
         try:
             if data_format == "CSV":
-                data = spark.read.csv(file_path)
+                data = spark.read.option("header", "true").csv(file_path)
             else:
                 data = spark.read.parquet(file_path)
 
