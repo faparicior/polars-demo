@@ -1,28 +1,24 @@
 import time
 import polars as pl
 
-def process_csv_in_chunks(file_path, chunk_size=10000):
-    # Use scan_csv for lazy evaluation
-    data = pl.scan_csv(file_path, low_memory=True, rechunk=False)
+def process_csv_in_chunks(file_path, batch_size=10000):
+    # Initialize a dictionary to count artist occurrences
+    unique_artists = set()
 
-    # Collect the result in a streaming fashion
-    result = data.collect(streaming=True)
+    # Read the CSV file in batches
+    batched_reader = pl.read_csv_batched(file_path, low_memory=True, batch_size=batch_size)
 
-    # Process the data in chunks
-    artist_counter = {}
-    for chunk in result.iter_slices(chunk_size):
-        chunk_df = chunk.to_pandas()
-        artist_counts = chunk_df['artist_name'].value_counts()
-        for artist, count in artist_counts.items():
-            if artist in artist_counter:
-                artist_counter[artist] += count
-            else:
-                artist_counter[artist] = count
+    batches = batched_reader.next_batches(2)
+    # Iterate over the batches
+    while batches:
+        for batch in batches:
+            batch_unique_artists = batch.select("artist_name").unique().to_series().to_list()
+            unique_artists.update(batch_unique_artists)
+        batches = batched_reader.next_batches(2)
 
     return pl.DataFrame({
-        'artist_name': list(artist_counter.keys()),
-        'count': list(artist_counter.values())
-    }).sort('count', reverse=True)
+        'artist_name': list(unique_artists)
+    })
 
 start_time = time.time()
 
