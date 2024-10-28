@@ -1,4 +1,3 @@
-# Code credits: https://github.com/ifnesi/1brc#submitting
 import time
 
 import polars as pl
